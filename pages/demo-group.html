@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Ajo Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500&family=DM+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brandGreen: "#1b5e3b",
+              brandGold: "#f2a83b",
+              brandCream: "#faf8f4",
+              brandMuted: "#6b7280",
+            },
+            fontFamily: {
+              sans: ["DM Sans", "sans-serif"],
+              display: ["Space Grotesk", "sans-serif"],
+              mono: ["DM Mono", "monospace"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-up { animation: fadeUp 0.6s ease forwards; opacity: 0; }
+      body { padding-bottom: 80px; background: #faf8f4; }
+    </style>
+  </head>
+  <body class="font-sans text-slate-900">
+    <nav class="sticky top-0 z-40 bg-brandCream/90 backdrop-blur-md border-b border-gray-200 px-6 md:px-16 py-4 flex justify-between items-center">
+      <a href="landing-page.html" class="font-display font-bold text-xl tracking-tight">
+        <span class="text-brandGreen">Smart</span><span class="text-brandGold">Ajo</span>
+        <span class="text-xs bg-brandGold text-white px-2 py-0.5 rounded-full ml-2 font-sans">Demo</span>
+      </a>
+      <a href="landing-page.html" class="text-xs text-brandMuted hover:text-brandGreen font-bold transition-colors">
+        ← Back
+      </a>
+    </nav>
+
+    <div id="app" class="max-w-3xl mx-auto px-6 pt-8 pb-24">
+      <div id="riskBanner"></div>
+
+      <div class="animate-fade-up [animation-delay:100ms] mb-6">
+        <h1 id="groupName" class="font-display text-2xl md:text-3xl font-bold text-slate-900">Loading...</h1>
+        <p id="groupTagline" class="text-brandMuted text-sm mt-1"></p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 animate-fade-up [animation-delay:200ms]">
+        <div class="bg-white p-5 rounded-2xl border border-gray-100">
+          <p class="text-[10px] text-brandMuted uppercase font-bold mb-1">Cycle</p>
+          <div id="cycleInfo"></div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-gray-100">
+          <p class="text-[10px] text-brandMuted uppercase font-bold mb-1">Payments</p>
+          <div id="progressBar"></div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-gray-100">
+          <p class="text-[10px] text-brandMuted uppercase font-bold mb-1">Health Score</p>
+          <div id="healthScore"></div>
+        </div>
+      </div>
+
+      <div class="animate-fade-up [animation-delay:300ms]">
+        <h2 class="font-display font-bold text-sm text-slate-900 mb-4">Members</h2>
+        <div id="membersList" class="space-y-3"></div>
+      </div>
+    </div>
+
+    <div id="judgeBar" class="fixed bottom-0 left-0 right-0 z-50 bg-slate-900 text-white px-4 sm:px-6 py-3 shadow-2xl">
+      <div id="judgeBarButtons" class="max-w-3xl mx-auto flex items-center justify-between gap-3 flex-wrap"></div>
+    </div>
+
+    <script type="module" src="../js/demo.js"></script>
+  </body>
+</html>

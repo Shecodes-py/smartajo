@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Ajo – Health Report</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+    @keyframes growBar{from{width:0;}to{width:var(--w);}}
+    .fade-up{animation:fadeUp 0.5s ease both;}
+    .fade-up-2{animation:fadeUp 0.5s ease 0.1s both;}
+    .bar{animation:growBar 1s ease 0.3s both;}
+    body{padding-bottom:90px;}
+    [v-cloak] { display: none; }
+  </style>
+</head>
+<body class="bg-[#F5F4EF] min-h-screen max-w-[430px] mx-auto font-['DM_Sans']">
+
+  <div class="px-5 pt-10">
+
+    <!-- Header -->
+    <div class="flex items-center gap-3 mb-7 fade-up">
+      <button onclick="window.history.back()" class="w-9 h-9 flex items-center justify-center rounded-full bg-white border border-[#E0E0E0] hover:bg-gray-50 active:scale-95 transition-all">
+        <svg class="w-4 h-4 text-[#1B5E3B]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <h1 class="font-['Fraunces'] text-xl font-bold text-[#1A1A1A]">Health Report</h1>
+    </div>
+
+    <!-- Overall Score (Brand Focus) -->
+    <div class="bg-white rounded-3xl p-6 mb-5 text-center fade-up shadow-sm border border-white">
+      <p class="text-xs font-bold text-[#9E9E9E] uppercase tracking-wider mb-2">Overall Group Score</p>
+      <p id="overallScore" class="font-['Fraunces'] text-7xl font-black text-[#1B5E3B] mb-1">--</p>
+      <div class="flex items-center justify-center gap-1.5 mb-6">
+        <div id="statusIcon">
+            <svg class="w-4 h-4 text-[#9E9E9E]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        </div>
+        <p id="statusText" class="text-sm font-bold text-[#9E9E9E]">Waiting for data</p>
+      </div>
+      
+      <!-- Mini score bar (Gold Fill) -->
+      <div class="h-3 bg-[#F0F0F0] rounded-full overflow-hidden">
+        <div id="overallBar" class="bar h-full bg-[#E0E0E0] rounded-full" style="--w:0%; width:0%"></div>
+      </div>
+      <div class="flex justify-between text-[10px] font-bold text-[#9E9E9E] mt-2 px-1">
+        <span>POOR</span><span>STABLE</span><span>EXCELLENT</span>
+      </div>
+    </div>
+
+    <!-- Score Breakdown -->
+    <div class="bg-white rounded-3xl p-5 mb-5 fade-up-2">
+      <p class="text-sm font-semibold text-[#1A1A1A] mb-5">Score Breakdown</p>
+      <div id="breakdownContainer" class="flex flex-col gap-5">
+        <p class="text-xs text-[#9E9E9E] text-center py-4 animate-pulse">Calculating…</p>
+      </div>
+    </div>
+
+    <!-- Per-member breakdown -->
+    <div class="bg-white rounded-3xl p-5 mb-5 fade-up-2">
+      <div class="flex items-center justify-between mb-4">
+        <p class="text-sm font-semibold text-[#1A1A1A]">Member Risk</p>
+        <div class="flex items-center gap-3 text-[10px] text-[#9E9E9E]">
+          <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#22C55E] inline-block"></span>Low</span>
+          <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#F5A623] inline-block"></span>Medium</span>
+          <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#EF4444] inline-block"></span>High</span>
+        </div>
+      </div>
+      <div id="memberRiskList" class="flex flex-col gap-3">
+        <p class="text-xs text-[#9E9E9E] text-center py-4 animate-pulse">Loading members…</p>
+      </div>
+    </div>
+
+    <!-- AI Insights (Themed) -->
+    <div class="bg-[#1B5E3B]/5 border border-[#1B5E3B]/10 rounded-2xl p-5 mb-5 fade-up-2">
+      <p class="text-xs font-bold text-[#1B5E3B] mb-3 flex items-center gap-2">
+        <span class="text-base">🤖</span> AI INSIGHTS
+      </p>
+      <div id="aiInsightsContent">
+        <p class="text-xs text-[#9E9E9E] animate-pulse">Analysing group data…</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Nav (Standard Smart Ajo Style) -->
+  <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white border-t border-[#F0F0F0] px-6 py-3 flex items-center justify-between z-50">
+    <button onclick="window.location.href='dashboard.html'" class="flex flex-col items-center gap-1 text-[#9E9E9E]">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
+      <span class="text-[10px]">Home</span>
+    </button>
+    <button onclick="window.location.href='groups.html'" class="flex flex-col items-center gap-1 text-[#1B5E3B]">
+      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      <span class="text-[10px] font-bold">Groups</span>
+    </button>
+    
+    <!-- Central Action Button (Gold) -->
+    <button onclick="window.location.href='make-payment.html'" class="w-14 h-14 bg-[#F2A83B] rounded-full flex items-center justify-center -mt-8 shadow-xl shadow-orange-900/30 active:scale-95 transition-all">
+      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+
+    <button onclick="window.location.href='alerts.html'" class="flex flex-col items-center gap-1 text-[#9E9E9E]">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="text-[10px]">Alerts</span>
+    </button>
+    <button onclick="window.location.href='profile.html'" class="flex flex-col items-center gap-1 text-[#9E9E9E]">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5.5 20a7 7 0 0 1 13 0"/></svg>
+      <span class="text-[10px]">Profile</span>
+    </button>
+  </div>
+
+  <script type="module">
+    import { computeGroupHealth } from "../js/api.js";
+
+    const groupId = new URLSearchParams(window.location.search).get("id");
+
+    // ── helpers ───────────────────────────────────────────────────────
+    const riskColors = { low: '#22C55E', medium: '#F5A623', high: '#EF4444' };
+    const riskBg     = { low: 'bg-[#F0FDF4]', medium: 'bg-[#FFF8E7]', high: 'bg-[#FFF1F0]' };
+    const riskText   = { low: 'text-[#22C55E]', medium: 'text-[#F5A623]', high: 'text-[#EF4444]' };
+    const insightIcon = {
+      positive: `<span class="text-[#22C55E] shrink-0 mt-0.5 font-bold">✓</span>`,
+      warning:  `<span class="text-[#F5A623] shrink-0 mt-0.5 font-bold">!</span>`,
+      danger:   `<span class="text-[#EF4444] shrink-0 mt-0.5 font-bold">✕</span>`,
+      info:     `<span class="text-[#9E9E9E] shrink-0 mt-0.5">ℹ</span>`,
+    };
+
+    async function loadHealthData() {
+      if (!groupId) {
+        document.getElementById("statusText").textContent = "No group selected";
+        return;
+      }
+
+      try {
+        const h = await computeGroupHealth(groupId);
+
+        // ── Overall score ───────────────────────────────────────────
+        document.getElementById("overallScore").textContent = h.score;
+        document.getElementById("overallScore").style.color = h.color;
+
+        document.getElementById("statusText").textContent  = h.label;
+        document.getElementById("statusText").style.color  = h.color;
+
+        const iconSvg = h.score >= 60
+          ? `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:${h.color}"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>`
+          : `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:${h.color}"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+        document.getElementById("statusIcon").innerHTML = iconSvg;
+
+        const bar = document.getElementById("overallBar");
+        bar.style.setProperty('--w', `${h.score}%`);
+        bar.style.width = `${h.score}%`;
+        bar.style.backgroundColor = h.color;
+
+        // ── Score breakdown bars ────────────────────────────────────
+        document.getElementById("breakdownContainer").innerHTML = h.breakdown.map(b => `
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <p class="text-xs text-[#6B6B6B]">${b.label}</p>
+              <p class="text-xs font-bold text-[#1A1A1A]">${b.value}%</p>
+            </div>
+            <div class="h-2 bg-[#F0F0F0] rounded-full overflow-hidden">
+              <div class="bar h-full rounded-full" style="--w:${b.value}%; width:${b.value}%; background-color:${b.color}"></div>
+            </div>
+          </div>`).join('');
+
+        // ── Per-member risk list ────────────────────────────────────
+        if (h.members.length === 0) {
+          document.getElementById("memberRiskList").innerHTML =
+            `<p class="text-xs text-[#9E9E9E] text-center py-4">No member data yet.</p>`;
+        } else {
+          document.getElementById("memberRiskList").innerHTML = h.members.map(m => {
+            const initials = m.name.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            const rateText = m.total > 0 ? `${m.paid}/${m.total} paid` : 'No contributions yet';
+            const missedTag = m.missed > 0
+              ? `<span class="text-[10px] font-bold text-[#EF4444] bg-[#FFF1F0] px-2 py-0.5 rounded-full">${m.missed} missed</span>`
+              : '';
+            const lateTag = m.late > 0
+              ? `<span class="text-[10px] font-semibold text-[#F5A623] bg-[#FFF8E7] px-2 py-0.5 rounded-full">${m.late} late</span>`
+              : '';
+            const riskTag = `<span class="text-[10px] font-bold ${riskText[m.risk_level]} ${riskBg[m.risk_level]} px-2 py-0.5 rounded-full capitalize">${m.risk_level} risk</span>`;
+
+            return `
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-white text-[10px] font-bold"
+                  style="background-color:${riskColors[m.risk_level]}">
+                  ${initials}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-[#1A1A1A] truncate">${m.name}</p>
+                  <p class="text-[10px] text-[#9E9E9E]">${rateText}</p>
+                </div>
+                <div class="flex flex-col items-end gap-1 shrink-0">
+                  ${riskTag}
+                  <div class="flex gap-1">${missedTag}${lateTag}</div>
+                </div>
+              </div>`;
+          }).join('');
+        }
+
+        // ── AI Insights ─────────────────────────────────────────────
+        document.getElementById("aiInsightsContent").innerHTML = h.insights.length
+          ? `<ul class="flex flex-col gap-2.5">${h.insights.map(i => `
+              <li class="text-xs text-[#6B6B6B] leading-relaxed flex items-start gap-2">
+                ${insightIcon[i.type] || insightIcon.info} ${i.text}
+              </li>`).join('')}</ul>`
+          : `<p class="text-xs text-[#9E9E9E]">No insights available yet.</p>`;
+
+      } catch (e) {
+        console.error("Health report error:", e);
+        document.getElementById("statusText").textContent = "Failed to load";
+      }
+    }
+
+    loadHealthData();
+  </script>
+</body>
+</html>

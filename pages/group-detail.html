@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Ajo – Group Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+      .fade-up { animation: fadeUp 0.5s ease both; }
+      body { padding-bottom: 100px; font-family: 'DM Sans', sans-serif; }
+      .tab-content { display: none; }
+      .tab-content.active { display: block; animation: fadeUp 0.35s ease both; }
+      .circle-bg        { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 10; }
+      .circle-fill      { fill: none; stroke: #F2A83B; stroke-width: 10; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset 1.2s ease-out; }
+      .risk-circle-bg   { fill: none; stroke: #E0E0E0; stroke-width: 10; }
+      .risk-circle-fill { fill: none; stroke: #1B5E3B; stroke-width: 10; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset 1.2s ease-out; }
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
+    </style>
+  </head>
+  <body class="bg-[#F5F4EF] min-h-screen max-w-[430px] mx-auto">
+
+    <!-- Header -->
+    <div class="bg-[#1B5E3B] px-5 pt-10 pb-20 relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10"></div>
+      <div class="flex items-center justify-between mb-6 relative z-10">
+        <button onclick="window.location.href='groups.html'" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/10">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="text-center">
+          <h1 id="groupTitle" class="text-lg font-bold text-white font-['Fraunces']">Loading…</h1>
+          <span id="adminBadge" class="hidden text-[10px] font-bold bg-[#F2A83B] text-white px-2 py-0.5 rounded-full mt-1 inline-block">Admin</span>
+        </div>
+        <div class="w-9"></div>
+      </div>
+
+      <div class="flex flex-col items-center relative z-10">
+        <div class="relative w-40 h-40 mb-3">
+          <svg viewBox="0 0 110 110" class="w-full h-full">
+            <circle class="circle-bg" cx="55" cy="55" r="50"/>
+            <circle id="progressCircle" class="circle-fill" cx="55" cy="55" r="50" stroke-dasharray="314" stroke-dashoffset="314"/>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center px-3 text-center">
+            <p class="text-white/60 text-[10px] mb-0.5">Collected so far</p>
+            <p id="currentPool" class="text-white text-xl font-bold leading-tight">₦0</p>
+            <span id="progressText" class="mt-1.5 bg-[#F2A83B] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">0%</span>
+          </div>
+        </div>
+        <p class="text-white/60 text-xs">Target Pool</p>
+        <p id="targetPool" class="text-white text-xl font-bold">₦0</p>
+        <p id="poolFormula" class="text-white/50 text-[10px] mt-1 font-medium">—</p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="bg-[#F5F4EF] rounded-t-3xl -mt-8 px-5 pt-5 relative z-20">
+      <div class="flex border-b border-[#E0E0E0] mb-5 overflow-x-auto scrollbar-hide gap-1">
+        <button id="tab-overview" onclick="switchTab('overview')" class="shrink-0 px-3 py-3 text-xs font-bold text-[#1B5E3B] border-b-2 border-[#1B5E3B] transition-all">Overview</button>
+        <button id="tab-members" onclick="switchTab('members')" class="shrink-0 px-3 py-3 text-xs font-medium text-[#9E9E9E] border-b-2 border-transparent transition-all">Members</button>
+        <button id="tab-contributions" onclick="switchTab('contributions')" class="shrink-0 px-3 py-3 text-xs font-medium text-[#9E9E9E] border-b-2 border-transparent transition-all">Contributions</button>
+        <button id="tab-rotation" onclick="switchTab('rotation')" class="shrink-0 px-3 py-3 text-xs font-medium text-[#9E9E9E] border-b-2 border-transparent transition-all">Rotation</button>
+        <button id="tab-risk" onclick="switchTab('risk')" class="shrink-0 px-3 py-3 text-xs font-medium text-[#9E9E9E] border-b-2 border-transparent transition-all">AI Risk</button>
+      </div>
+
+      <!-- Overview -->
+      <div id="content-overview" class="tab-content active">
+        <p class="text-[11px] font-bold text-[#9E9E9E] uppercase mb-3 tracking-wider">Group Summary</p>
+        <div class="bg-white rounded-2xl overflow-hidden border border-[#F5F5F5] shadow-sm mb-4">
+          <div class="flex items-center justify-between px-4 py-3.5 border-b border-[#F5F5F5]">
+            <span class="text-sm text-[#6B6B6B]">Contribution / cycle</span>
+            <span id="summaryContribution" class="text-sm font-bold text-[#F2A83B]">—</span>
+          </div>
+          <div class="flex items-center justify-between px-4 py-3.5 border-b border-[#F5F5F5]">
+            <span class="text-sm text-[#6B6B6B]">Frequency</span>
+            <span id="summaryFrequency" class="text-sm font-bold text-[#1A1A1A]">—</span>
+          </div>
+          <div class="flex items-center justify-between px-4 py-3.5 border-b border-[#F5F5F5]">
+            <span class="text-sm text-[#6B6B6B]">Members</span>
+            <span id="summaryMembers" class="text-sm font-bold text-[#1A1A1A]">—</span>
+          </div>
+          <div class="flex items-center justify-between px-4 py-3.5 border-b border-[#F5F5F5]">
+            <span class="text-sm text-[#6B6B6B]">Target pool</span>
+            <span id="summaryTotalPool" class="text-sm font-bold text-[#1B5E3B]">—</span>
+          </div>
+          <div class="flex items-center justify-between px-4 py-3.5 border-b border-[#F5F5F5]">
+            <span class="text-sm text-[#6B6B6B]">Status</span>
+            <span id="summaryStatus" class="text-sm font-bold capitalize">—</span>
+          </div>
+          <div class="flex items-center justify-between px-4 py-3.5 border-b border-[#F5F5F5]">
+            <span class="text-sm text-[#6B6B6B]">Start date</span>
+            <span id="summaryStartDate" class="text-sm font-bold text-[#1A1A1A]">—</span>
+          </div>
+          <div class="flex items-center justify-between px-4 py-3.5">
+            <span class="text-sm text-[#6B6B6B]">Due date</span>
+            <span id="summaryDueDate" class="text-sm font-bold">—</span>
+          </div>
+        </div>
+
+        <!-- Invite code — admin only -->
+        <div id="codeSection" class="hidden bg-white rounded-2xl px-4 py-4 border border-[#F5F5F5] shadow-sm">
+          <p class="text-[11px] font-bold text-[#9E9E9E] uppercase tracking-wider mb-3">Invite Code</p>
+          <div class="flex items-center gap-2">
+            <div class="flex-1 bg-[#F5F4EF] rounded-xl px-4 py-3 font-mono font-bold text-[#1B5E3B] tracking-widest text-sm" id="codeDisplay">
+              ••••••••••
+            </div>
+            <button id="toggleCodeBtn" class="w-10 h-10 bg-[#F5F4EF] rounded-xl flex items-center justify-center hover:bg-[#E8F5EE] transition-colors">
+              <svg id="eyeIcon" class="w-4 h-4 text-[#1B5E3B]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+            <button id="copyCodeBtn" class="w-10 h-10 bg-[#1B5E3B] rounded-xl flex items-center justify-center hover:bg-[#14452b] transition-colors">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <!-- Extra rows: start date, end date, total rounds — injected if backend returns them -->
+        <div id="summaryExtra" class="bg-white rounded-2xl overflow-hidden border border-[#F5F5F5] mt-3 hidden"></div>
+      </div>
+
+      <!-- Members -->
+      <div id="content-members" class="tab-content">
+        <div id="membersList" class="flex flex-col gap-3">
+          <p class="text-center py-10 text-[#9E9E9E] text-xs animate-pulse">Loading members…</p>
+        </div>
+      </div>
+
+      <!-- Contributions -->
+      <div id="content-contributions" class="tab-content">
+        <div id="contributionsList">
+          <p class="text-center py-10 text-[#9E9E9E] text-xs animate-pulse">Loading contributions…</p>
+        </div>
+      </div>
+
+      <!-- Rotation -->
+      <div id="content-rotation" class="tab-content">
+        <div id="rotationList">
+          <p class="text-center py-10 text-[#9E9E9E] text-xs animate-pulse">Loading schedule…</p>
+        </div>
+      </div>
+
+      <!-- AI Risk -->
+      <div id="content-risk" class="tab-content">
+        <div onclick="navigateToHealthReport()" class="bg-white rounded-3xl border border-[#F5F5F5] p-8 flex flex-col items-center mb-6 cursor-pointer active:scale-95 transition-transform shadow-sm">
+          <p class="text-xs font-bold text-[#1A1A1A] mb-6">Group Health Score</p>
+          <div class="relative w-32 h-32 mb-4">
+            <svg viewBox="0 0 110 110" class="w-full h-full">
+              <circle class="risk-circle-bg" cx="55" cy="55" r="50"/>
+              <circle id="riskCircleFill" class="risk-circle-fill" cx="55" cy="55" r="50" stroke-dasharray="314" stroke-dashoffset="314"/>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span id="healthScoreValue" class="text-3xl font-bold text-[#1B5E3B]">—</span>
+              <span class="text-[10px] text-[#9E9E9E]">out of 100</span>
+            </div>
+          </div>
+          <p id="healthStatusText" class="text-xs font-bold text-[#F2A83B]">Tap to view full report</p>
+        </div>
+        <p class="text-[11px] font-bold text-[#9E9E9E] uppercase mb-3 tracking-wider">Member Risk Levels</p>
+        <div id="memberRiskList" class="flex flex-col gap-2 mb-4"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white border-t border-[#F0F0F0] px-6 py-3 flex items-center justify-between z-50">
+      <button onclick="window.location.href='dashboard.html'" class="flex flex-col items-center gap-1 text-[#9E9E9E]">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
+        <span class="text-[10px] font-medium">Home</span>
+      </button>
+      <button onclick="window.location.href='groups.html'" class="flex flex-col items-center gap-1 text-[#1B5E3B]">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        <span class="text-[10px] font-bold">Groups</span>
+      </button>
+      <button onclick="window.location.href='make-payment.html'" class="w-14 h-14 bg-[#F2A83B] rounded-full flex items-center justify-center -mt-8 shadow-xl shadow-orange-900/30 active:scale-90 transition-transform">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <button onclick="window.location.href='alerts.html'" class="flex flex-col items-center gap-1 text-[#9E9E9E]">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="text-[10px] font-medium">Alerts</span>
+      </button>
+      <button onclick="window.location.href='profile.html'" class="flex flex-col items-center gap-1 text-[#9E9E9E]">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5.5 20a7 7 0 0 1 13 0"/></svg>
+        <span class="text-[10px] font-medium">Profile</span>
+      </button>
+    </div>
+
+    <script type="module">
+      import { getMe, getGroupDetail, getCycleContributions, computeGroupHealth } from "../js/api.js";
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const groupId   = urlParams.get("id");
+      const loaded    = { contributions: false, risk: false };
+
+      // ─── Helpers ──────────────────────────────────────────────
+
+      function memberDisplayName(m) {
+        if (m.full_name?.trim()) return m.full_name.trim();
+        if (m.phone_number)      return m.phone_number;
+        return `Member #${m.id}`;
+      }
+
+      function memberInitials(m) {
+        if (m.full_name?.trim())
+          return m.full_name.trim().split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
+        if (m.phone_number) return m.phone_number.slice(-2);
+        return "??";
+      }
+
+      const FREQ_MAP = { daily: "Daily", weekly: "Weekly", biweekly: "Bi-weekly", monthly: "Monthly" };
+      function freqLabel(f) {
+        if (!f?.trim()) return "Not set";
+        return FREQ_MAP[f.toLowerCase()] ?? (f.charAt(0).toUpperCase() + f.slice(1));
+      }
+
+      function fmtDate(d) {
+        if (!d) return "Not set";
+        return new Date(d).toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" });
+      }
+
+      // Due date with grace period warning based on frequency
+      function dueDateDisplay(dueDateStr, frequency) {
+        if (!dueDateStr) return `<span class="text-sm font-bold text-[#9E9E9E]">Not set</span>`;
+
+        const due  = new Date(dueDateStr);
+        const now  = new Date();
+        const diff = Math.ceil((due - now) / 86400000);
+
+        // Grace period in days per frequency
+        const grace = { daily: 0.25, weekly: 2, biweekly: 3, monthly: 7 }; // daily = 6hrs ≈ 0.25 days
+        const graceHours = { daily: 6, weekly: 48, biweekly: 72, monthly: 168 };
+        const freq  = frequency?.toLowerCase();
+        const hoursLeft = (due - now) / 3600000;
+        const inGrace   = freq && hoursLeft > 0 && hoursLeft <= (graceHours[freq] ?? 0);
+
+        let label, cls;
+        if (diff < 0)      { label = `Overdue — ${fmtDate(dueDateStr)}`;  cls = "text-[#EF4444]"; }
+        else if (inGrace)  { label = `⚠️ Grace period — ${fmtDate(dueDateStr)}`; cls = "text-[#F2A83B]"; }
+        else if (diff === 0){ label = `Today`;                              cls = "text-[#F2A83B]"; }
+        else if (diff === 1){ label = `Tomorrow`;                           cls = "text-[#F2A83B]"; }
+        else               { label = fmtDate(dueDateStr);                  cls = "text-[#1A1A1A]"; }
+
+        return `<span class="text-sm font-bold ${cls}">${label}</span>`;
+      }
+
+      const RISK_CONFIG = {
+        low:    { label: "Low Risk",    color: "text-[#22C55E]", bg: "bg-[#F0FDF4]", border: "border-[#BBF7D0]" },
+        medium: { label: "Medium Risk", color: "text-[#F5A623]", bg: "bg-[#FFF9ED]", border: "border-[#FDE6B1]" },
+        high:   { label: "High Risk",   color: "text-[#EF4444]", bg: "bg-[#FEF2F2]", border: "border-[#FECACA]" },
+      };
+      function riskBadge(level) {
+        const cfg = RISK_CONFIG[level?.toLowerCase()] || RISK_CONFIG.low;
+        return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${cfg.bg} ${cfg.border} ${cfg.color}">${cfg.label}</span>`;
+      }
+
+      // ─── Main init ────────────────────────────────────────────
+      async function initDetails() {
+        if (!groupId) return;
+        try {
+          const [group, me] = await Promise.all([getGroupDetail(groupId), getMe()]);
+
+          // ✅ Admin check: compare created_by.id against logged-in user id
+          const isAdmin = group.created_by?.id === me.id;
+
+          const contributionAmount = parseFloat(group.contribution_amount) || 0;
+          const maxMembers         = group.max_members   || 0;
+          const totalMembers       = group.total_members || 0;
+          const poolAmount         = parseFloat(group.pool_amount) || 0;
+          const frequency          = group.contribution_frequency || "";
+          const members            = group.members || [];
+          const targetPool         = contributionAmount * maxMembers;
+          const pct = targetPool > 0 ? Math.min(Math.round((poolAmount / targetPool) * 100), 100) : 0;
+
+          // Header
+          document.getElementById("groupTitle").textContent = group.name;
+          if (isAdmin) document.getElementById("adminBadge").classList.remove("hidden");
+
+          document.getElementById("currentPool").textContent  = `₦${poolAmount.toLocaleString("en-NG")}`;
+          document.getElementById("targetPool").textContent   = `₦${targetPool.toLocaleString("en-NG")}`;
+          document.getElementById("poolFormula").textContent  = `₦${contributionAmount.toLocaleString("en-NG")} × ${maxMembers} members`;
+          document.getElementById("progressText").textContent = `${pct}% filled`;
+          
+          setTimeout(() => {
+            const circle = document.getElementById("progressCircle");
+            if(circle) circle.style.strokeDashoffset = 314 - (pct / 100) * 314;
+          }, 200);
+
+          // Overview
+          document.getElementById("summaryContribution").textContent = `₦${contributionAmount.toLocaleString("en-NG")}`;
+          document.getElementById("summaryFrequency").textContent    = freqLabel(frequency);
+          document.getElementById("summaryMembers").textContent      = `${totalMembers} / ${maxMembers}`;
+          document.getElementById("summaryTotalPool").textContent    = `₦${targetPool.toLocaleString("en-NG")}`;
+          document.getElementById("summaryStartDate").textContent    = fmtDate(group.start_date);
+          document.getElementById("summaryDueDate").innerHTML        = dueDateDisplay(group.due_date, frequency);
+
+          const statusEl = document.getElementById("summaryStatus");
+          statusEl.textContent = group.status || "—";
+          statusEl.className = `text-sm font-bold capitalize px-2 py-0.5 rounded-full ${
+            group.status === "active" ? "text-[#22C55E] bg-[#F0FDF4]" :
+            group.status === "open"   ? "text-[#2563EB] bg-[#EFF6FF]" :
+                                        "text-[#9E9E9E] bg-[#F5F5F5]"
+          }`;
+
+          // Invite code — admin only
+          if (isAdmin && group.code) {
+            document.getElementById("codeSection").classList.remove("hidden");
+            let codeVisible = false;
+            const codeDisplay = document.getElementById("codeDisplay");
+
+            document.getElementById("toggleCodeBtn").addEventListener("click", () => {
+              codeVisible = !codeVisible;
+              codeDisplay.textContent = codeVisible ? group.code : "••••••••••";
+              document.getElementById("eyeIcon").innerHTML = codeVisible
+                ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`
+                : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+            });
+
+            document.getElementById("copyCodeBtn").addEventListener("click", () => {
+              navigator.clipboard.writeText(group.code).catch(() => {});
+              const btn = document.getElementById("copyCodeBtn");
+              btn.innerHTML = `<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>`;
+              setTimeout(() => {
+                btn.innerHTML = `<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+              }, 2000);
+            });
+          }
+
+          renderMembers(members, groupId);
+          renderRotation(members, contributionAmount, maxMembers);
+          renderMemberRisk(members);
+
+        } catch (e) {
+          console.error(e);
+          document.getElementById("groupTitle").textContent = "Error loading group";
+        }
+      }
+
+      // ─── Members tab ──────────────────────────────────────────
+      function renderMembers(members, gId) {
+        const el = document.getElementById("membersList");
+        if (!members.length) {
+          el.innerHTML = '<p class="text-center py-10 text-[#9E9E9E] text-xs">No members yet.</p>';
+          return;
+        }
+        el.innerHTML = members.map((m) => {
+          const name     = memberDisplayName(m);
+          const initials = memberInitials(m);
+          const joined   = fmtDate(m.joined_at?.split("T")[0]);
+          return `
+            <a href="member-profile.html?memberId=${m.id}&groupId=${gId}"
+              class="bg-white border border-[#F5F5F5] rounded-2xl p-4 flex items-center gap-3 active:scale-[0.98] transition-transform cursor-pointer hover:border-[#1B5E3B]/20">
+              <div class="w-11 h-11 rounded-full bg-[#1B5E3B]/10 flex items-center justify-center shrink-0">
+                <span class="text-sm font-bold text-[#1B5E3B]">${initials}</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold text-[#1A1A1A] truncate">${name}</p>
+                <p class="text-[11px] text-[#9E9E9E] mt-0.5">Slot #${m.rotation_order} · Joined ${joined}</p>
+              </div>
+              <div class="flex flex-col items-end gap-1.5 shrink-0">
+                ${riskBadge(m.risk_level)}
+                <span class="text-[10px] ${m.has_received_payout ? "text-[#22C55E] font-bold" : "text-[#9E9E9E]"}">
+                  ${m.has_received_payout ? "Paid out ✓" : "Awaiting"}
+                </span>
+              </div>
+            </a>`;
+        }).join("");
+      }
+
+      // ─── Rotation tab ─────────────────────────────────────────
+      function renderRotation(members, contributionAmount, maxMembers) {
+        const el = document.getElementById("rotationList");
+        if (!members.length) {
+          el.innerHTML = '<p class="text-center py-10 text-[#9E9E9E] text-xs">No rotation schedule yet.</p>';
+          return;
+        }
+        const sorted      = [...members].sort((a, b) => a.rotation_order - b.rotation_order);
+        const payoutTotal = contributionAmount * maxMembers;
+        const nextMember  = sorted.find(m => !m.has_received_payout);
+
+        el.innerHTML = `
+          <p class="text-[11px] font-bold text-[#9E9E9E] uppercase mb-3 tracking-wider">Payout Schedule</p>
+          <div class="flex flex-col gap-2">
+            ${sorted.map((m) => {
+              const name    = memberDisplayName(m);
+              const initials = memberInitials(m);
+              const isPaid  = m.has_received_payout;
+              const isNext  = !isPaid && m.id === nextMember?.id;
+              const dotBg   = isPaid ? "bg-[#22C55E]" : isNext ? "bg-[#F2A83B]" : "bg-[#E0E0E0]";
+              const subtext = isPaid ? "Received payout ✓" : isNext ? "⏳ Next to receive" : `Position #${m.rotation_order}`;
+              return `
+                <div class="bg-white rounded-2xl px-4 py-3 flex items-center gap-3 border ${isNext ? "border-[#F2A83B]/30 bg-[#FFF9ED]/50" : "border-[#F5F5F5]"}">
+                  <div class="w-8 h-8 ${dotBg} rounded-full flex items-center justify-center shrink-0">
+                    <span class="text-white text-[11px] font-bold">${isPaid ? "✓" : m.rotation_order}</span>
+                  </div>
+                  <div class="w-8 h-8 rounded-full bg-[#1B5E3B]/10 flex items-center justify-center shrink-0">
+                    <span class="text-[10px] font-bold text-[#1B5E3B]">${initials}</span>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-[#1A1A1A] truncate">${name}</p>
+                    <p class="text-xs text-[#9E9E9E]">${subtext}</p>
+                  </div>
+                  <span class="text-sm font-bold text-[#1B5E3B] shrink-0">₦${payoutTotal.toLocaleString("en-NG")}</span>
+                </div>`;
+            }).join("")}
+          </div>`;
+      }
+
+      // ─── AI Risk tab ──────────────────────────────────────────
+      function renderMemberRisk(members) {
+        const el = document.getElementById("memberRiskList");
+        if (!members.length) { el.innerHTML = ""; return; }
+        el.innerHTML = members.map((m) => {
+          const name = memberDisplayName(m);
+          const cfg  = RISK_CONFIG[m.risk_level?.toLowerCase()] || RISK_CONFIG.low;
+          return `
+            <div class="flex items-center gap-3 p-3 rounded-xl border ${cfg.bg} ${cfg.border}">
+              <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0 shadow-sm">
+                <span class="text-[10px] font-bold ${cfg.color}">${memberInitials(m)}</span>
+              </div>
+              <span class="font-bold text-xs ${cfg.color} flex-1 truncate">${name}</span>
+              <span class="${cfg.color} text-xs font-bold shrink-0">${cfg.label}</span>
+              <span class="text-[#9E9E9E] text-xs shrink-0">Score: ${m.risk_score ?? 0}</span>
+            </div>`;
+        }).join("");
+      }
+
+      // ─── Contributions (lazy) ─────────────────────────────────
+      async function loadContributions() {
+        const el = document.getElementById("contributionsList");
+        try {
+          const data = await getCycleContributions(groupId);
+          const list = Array.isArray(data) ? data : (data.results || data.contributions || []);
+          if (!list.length) {
+            el.innerHTML = '<p class="text-center py-10 text-[#9E9E9E] text-xs">No contributions recorded yet.</p>';
+            return;
+          }
+          const statusMap = {
+            paid:    `<span class="text-xs text-[#22C55E] font-bold">✓ Paid</span>`,
+            missed:  `<span class="text-xs text-[#EF4444] font-bold">✗ Missed</span>`,
+            late:    `<span class="text-xs text-[#F2A83B] font-bold">⚠ Late</span>`,
+            pending: `<span class="text-xs text-[#F5A623] font-semibold">Pending</span>`,
+          };
+          el.innerHTML = `<div class="flex flex-col gap-2">${list.map((c) => {
+            const name   = c.user_name || c.full_name || "Member";
+            const status = statusMap[c.status?.toLowerCase()] || statusMap.pending;
+            const date   = c.paid_at
+              ? new Date(c.paid_at).toLocaleDateString("en-NG", { month: "short", day: "numeric" })
+              : "—";
+            return `
+              <div class="bg-white rounded-2xl px-4 py-3 flex items-center justify-between border border-[#F5F5F5]">
+                <div>
+                  <p class="text-sm font-semibold text-[#1A1A1A]">${name}</p>
+                  <p class="text-xs text-[#9E9E9E]">Round ${c.round_number ?? "—"} · ${date}</p>
+                </div>
+                ${status}
+              </div>`;
+          }).join("")}</div>`;
+        } catch (e) {
+          el.innerHTML = `<p class="text-center py-6 text-red-400 text-xs">${e.message}</p>`;
+        }
+      }
+
+      // ─── Health score (lazy) ──────────────────────────────────
+      async function loadRisk() {
+        try {
+          const h = await computeGroupHealth(groupId);
+
+          document.getElementById("healthScoreValue").textContent = h.score;
+          document.getElementById("healthScoreValue").style.color = h.color;
+          document.getElementById("healthStatusText").textContent = h.label;
+          document.getElementById("healthStatusText").style.color = h.color;
+          
+          const riskRing = document.getElementById("riskCircleFill");
+          if(riskRing) {
+            riskRing.style.stroke = h.color;
+            riskRing.style.strokeDashoffset = 314 - (h.score / 100) * 314;
+          }
+
+          const container = document.getElementById("content-risk");
+          if (h.insights && h.insights.length) {
+            const insightIcon = { positive:'✓', warning:'!', danger:'✕', info:'ℹ' };
+            const insightColor = { positive:'#22C55E', warning:'#F5A623', danger:'#EF4444', info:'#9E9E9E' };
+            
+            // Avoid duplicate appends if user keeps toggling tabs
+            const checkInsights = document.getElementById("insightsWrapper");
+            if(checkInsights) checkInsights.remove();
+
+            container.insertAdjacentHTML('beforeend', `
+              <div id="insightsWrapper" class="w-full">
+                <div class="flex flex-col gap-2 mt-4">
+                  ${h.insights.map(i => `
+                    <div class="flex items-start gap-2 bg-white rounded-2xl px-4 py-3 border border-[#F5F5F5]">
+                      <span class="text-xs font-bold shrink-0 mt-0.5" style="color:${insightColor[i.type]}">${insightIcon[i.type]}</span>
+                      <p class="text-xs text-[#6B6B6B] leading-relaxed">${i.text}</p>
+                    </div>`).join('')}
+                </div>
+                <button onclick="window.location.href='health-report.html?id=${groupId}'"
+                  class="w-full mt-4 py-3 bg-[#3A3A3A] text-white text-xs font-semibold rounded-full active:scale-95 transition-transform">
+                  View Full Health Report →
+                </button>
+              </div>`);
+          }
+        } catch (e) { console.error('loadRisk:', e.message); }
+      }
+
+      // ─── Tab switcher ─────────────────────────────────────────
+      window.switchTab = function (tabId) {
+        document.querySelectorAll("[id^='tab-']").forEach((btn) => {
+          btn.classList.remove("border-[#1B5E3B]", "text-[#1B5E3B]", "font-bold");
+          btn.classList.add("border-transparent", "text-[#9E9E9E]", "font-medium");
+        });
+        const active = document.getElementById(`tab-${tabId}`);
+        active.classList.add("border-[#1B5E3B]", "text-[#1B5E3B]", "font-bold");
+        active.classList.remove("text-[#9E9E9E]", "font-medium", "border-transparent");
+        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+        document.getElementById(`content-${tabId}`).classList.add("active");
+
+        if (tabId === "contributions" && !loaded.contributions) { loaded.contributions = true; loadContributions(); }
+        if (tabId === "risk"          && !loaded.risk)          { loaded.risk          = true; loadRisk(); }
+      };
+
+      window.navigateToHealthReport = () => {
+        window.location.href = groupId ? `health-report.html?id=${groupId}` : "health-report.html";
+      };
+
+      initDetails();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Ajo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandGreen: '#1b5e3b',
+            brandGold: '#f2a83b',
+            brandCream: '#faf8f4',
+          },
+          fontFamily: {
+            display: ['Space Grotesk', 'sans-serif'],
+            sans: ['DM Sans', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-up { animation: fadeUp 0.8s ease forwards; }
+    
+    html, body { height: 100%; margin: 0; padding: 0; }
+  </style>
+</head>
+<body class="bg-brandCream flex items-center justify-center overflow-hidden font-sans m-0 p-0 w-screen h-screen">
+
+  <div class="animate-fade-up flex flex-col items-center text-center gap-8 px-6">
+
+    <!-- Logo Container -->
+    <div class="w-32 h-32 bg-brandGreen flex items-center justify-center rounded-[32px] shadow-2xl shadow-brandGreen/20 relative overflow-hidden">
+      <div class="absolute -top-10 -right-10 w-20 h-20 bg-brandGold opacity-20 rounded-full"></div>
+      
+      <img src="./assets/icons/logo.png" alt="Smart Ajo Logo" class="w-full h-full object-cover" 
+           onerror="this.style.display='none'; this.parentNode.innerHTML='<span class=\'font-display text-4xl font-bold text-white z-10\'>SA</span>'"/>
+    </div>
+
+    <!-- Branding -->
+    <div>
+      <h1 class="font-display text-5xl font-bold tracking-tighter mb-2">
+        <span class="text-brandGreen">Smart</span><span class="text-brandGold">Ajo</span>
+      </h1>
+      <p class="text-brandGreen/60 font-medium tracking-wide uppercase text-[10px]">
+        Save Together. Grow Together.
+      </p>
+    </div>
+
+    <!-- Loading State -->
+    <div class="mt-4 flex gap-1.5">
+      <div class="w-1.5 h-1.5 rounded-full bg-brandGreen/20 animate-bounce" style="animation-delay: 0.1s"></div>
+      <div class="w-1.5 h-1.5 rounded-full bg-brandGreen/40 animate-bounce" style="animation-delay: 0.2s"></div>
+      <div class="w-1.5 h-1.5 rounded-full bg-brandGreen/20 animate-bounce" style="animation-delay: 0.3s"></div>
+    </div>
+
+  </div>
+
+  <script type="module">
+    // Smart Redirect Logic
+    setTimeout(() => {
+      const token = localStorage.getItem("ajo_token");
+      
+      if (token && token !== "undefined") {
+        // Logged in: Go to dashboard
+        window.location.href = 'pages/landing-page.html';
+      } else {
+        // Not logged in: Go to landing page inside the pages folder
+        window.location.href = 'pages/landing-page.html';
+      }
+    }, 2500);
+  </script>
+</body>
+</html>

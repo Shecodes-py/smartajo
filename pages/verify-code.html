@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Ajo – Verify Code</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandGreen: '#1b5e3b',
+            brandGold: '#f2a83b',
+            brandCream: '#faf8f4',
+          },
+          fontFamily: {
+            display: ['Space Grotesk', 'sans-serif'],
+            sans: ['DM Sans', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.7s ease both; }
+  </style>
+</head>
+<body class="bg-brandCream min-h-screen max-w-[430px] mx-auto flex flex-col font-sans">
+
+  <div class="flex flex-col flex-1 px-6 pt-14 pb-10 fade-up">
+
+    <button onclick="history.back()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-slate-200 mb-8 hover:bg-slate-50 transition-colors shadow-sm">
+      <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+
+    <div class="w-14 h-14 bg-brandGreen rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-brandGreen/20">
+      <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/>
+      </svg>
+    </div>
+
+    <h1 class="font-display text-4xl font-bold text-slate-900 mb-2 tracking-tighter">Verify Code</h1>
+    <p class="text-sm text-slate-500 mb-10 leading-relaxed font-medium">We sent a 4-digit verification code to your email. Enter it below to secure your account.</p>
+
+    <div class="mb-6">
+      <label class="text-[11px] font-bold uppercase tracking-widest text-brandGreen mb-4 block ml-1">Enter Code</label>
+      <div class="flex gap-4 justify-between">
+        <input type="text" maxlength="1" id="otp1"
+          class="w-16 h-18 text-center text-3xl font-bold bg-white border border-slate-200 rounded-2xl outline-none focus:border-brandGreen focus:ring-4 focus:ring-brandGreen/5 transition-all text-slate-900 shadow-sm py-4"
+          oninput="moveNext(this, 'otp2')"/>
+        <input type="text" maxlength="1" id="otp2"
+          class="w-16 h-18 text-center text-3xl font-bold bg-white border border-slate-200 rounded-2xl outline-none focus:border-brandGreen focus:ring-4 focus:ring-brandGreen/5 transition-all text-slate-900 shadow-sm py-4"
+          oninput="moveNext(this, 'otp3')"/>
+        <input type="text" maxlength="1" id="otp3"
+          class="w-16 h-18 text-center text-3xl font-bold bg-white border border-slate-200 rounded-2xl outline-none focus:border-brandGreen focus:ring-4 focus:ring-brandGreen/5 transition-all text-slate-900 shadow-sm py-4"
+          oninput="moveNext(this, 'otp4')"/>
+        <input type="text" maxlength="1" id="otp4"
+          class="w-16 h-18 text-center text-3xl font-bold bg-white border border-slate-200 rounded-2xl outline-none focus:border-brandGreen focus:ring-4 focus:ring-brandGreen/5 transition-all text-slate-900 shadow-sm py-4"
+          oninput="moveNext(this, null)"/>
+      </div>
+    </div>
+
+    <p class="text-xs text-slate-500 mb-10 font-medium">
+      Didn't receive a code?
+      <button class="text-brandGreen font-bold hover:underline underline-offset-4 ml-1">Resend Code</button>
+    </p>
+
+    <button
+      onclick="window.location.href='new-password.html'"
+      class="w-full py-5 bg-brandGreen text-white rounded-2xl text-sm font-black uppercase tracking-[0.2em] 
+             transition-all duration-300 hover:brightness-110 shadow-lg shadow-green-900/20 active:scale-95">
+      Verify Account
+    </button>
+
+  </div>
+
+  <script>
+    function moveNext(current, nextId) {
+      if (current.value.length === 1 && nextId) {
+        document.getElementById(nextId).focus();
+      }
+    }
+  </script>
+</body>
+</html>
